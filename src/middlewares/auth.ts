@@ -26,7 +26,7 @@ export const verifyAuthentication = catchAsyncErrors(
       process.env.JWT_SECRET!
     ) as { userId: number };
 
-    const user = await User.findByPk(payload.userId, { attributes: ['id'] });
+    const user = await User.findByPk(payload.userId, { attributes: ['id', 'role'] });
     if (!user) {
       res.clearCookie(process.env.COOKIE_NAME!, {
         httpOnly: true,
@@ -35,7 +35,6 @@ export const verifyAuthentication = catchAsyncErrors(
       });
       return next(new ErrorHandler('User not found', 401));
     }
-
     req.id = user.id
     req.role = user.role
 

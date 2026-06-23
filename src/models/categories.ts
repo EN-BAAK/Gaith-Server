@@ -5,6 +5,7 @@ import { ID } from "../types/variables";
 export class Category extends Model<CategoryAttributes, CategoryCreationAttributes> implements CategoryAttributes {
   public id!: ID;
   public name!: string;
+  public icon!: string
 
   public toJSON(): object {
     return { ...this.get() };
@@ -27,8 +28,12 @@ export default (sequelize: Sequelize) => {
         autoIncrement: true,
         primaryKey: true,
       },
-
       name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+      },
+      icon: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,

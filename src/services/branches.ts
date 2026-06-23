@@ -4,69 +4,82 @@ import { GroupBranch } from "../models/groupBranches";
 import { BranchCreationAttributes } from "../types/models";
 import { ID } from "../types/variables";
 
-const findBranchById = async (id: ID) => {
-  const item = await Branch.findByPk(id)
+const findBranchById = async (id: ID, withSite = false) => {
+  const item = await Branch.findByPk(id, {
+    include: withSite ? [{ model: GroupBranch, as: 'groupBranch', attributes: ["name"] }] : []
+  })
+
   if (!item) throw new ErrorHandler("Branch not found", 404)
   return item;
+}
+
+const mapBranch = (branch: any) => {
+  const json = branch.toJSON()
+
+  return {
+    ...json,
+    groupId: undefined,
+    group: json.groupBranch.name,
+    groupBranch: undefined
+  }
+}
+
+const mapBranchSettings = (branch: any) => {
+  const json = branch.toJSON()
+
+  return {
+    ...json,
+    group: json.groupBranch.name,
+    groupBranch: undefined
+  }
 }
 
 export const getBranches = async () => {
   const branches = await Branch.findAll({
     include: [{ model: GroupBranch, as: "groupBranch", attributes: ["name"] }],
   });
-  return branches.map((branch: any) => {
-    const json = branch.toJSON();
-
-    return {
-      ...json,
-      groupId: undefined,
-      group: json.groupBranch ? json.groupBranch.name : null,
-      groupBranch: undefined,
-    };
-  });
+  return branches.map((branch: any) => mapBranch(branch)
+  );
 };
 
 export const getBranchById = async (id: ID) => {
-  const branch = await findBranchById(id)
+  const branch = await findBranchById(id, true)
+  return mapBranch(branch);
+};
 
-  const json = branch.toJSON();
-  return json;
+export const getBranchesSettings = async () => {
+  const branches = await Branch.findAll({
+    include: [{ model: GroupBranch, as: "groupBranch", attributes: ["name"] }],
+  });
+
+  return branches.map((branch) => mapBranchSettings(branch));
+};
+
+export const getBranchByIdSettings = async (id: ID) => {
+  const branch = await findBranchById(id, true);
+  return mapBranchSettings(branch);
 };
 
 export const createBranch = async (data: BranchCreationAttributes) => {
   const branch = await Branch.create(data);
-  let group = undefined
-  if (branch.groupId)
-    group = await GroupBranch.findByPk(data.groupId);
-
-  return await {
-    ...branch.toJSON(),
-    groupId: undefined,
-    group: group ? group.name : null,
-  };
+  const dataBranch = await findBranchById(branch.id, true)
+  return mapBranchSettings(dataBranch);
 };
 
 export const updateBranch = async (
   id: ID,
   data: Partial<BranchCreationAttributes>
 ) => {
-  const branch = await findBranchById(id)
+  const branch = await findBranchById(id, true)
 
   Object.assign(branch, data);
   await branch.save();
 
-  let group = undefined
-  if (branch.groupId)
-    group = await GroupBranch.findByPk(branch.groupId);
-
-  return await {
-    ...branch.toJSON(),
-    groupId: undefined,
-    group: group ? group.name : null,
-  };
+  const dataBranch = await findBranchById(branch.id, true)
+  return mapBranchSettings(dataBranch);
 };
 
 export const deleteBranch = async (id: ID) => {
   const branch = await findBranchById(id)
-  await branch.destroy();
+  return await branch.destroy();
 };

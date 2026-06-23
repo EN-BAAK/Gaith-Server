@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { catchAsyncErrors } from "../middlewares/error";
-import { getBranches as getBranchesService, getBranchById as getBranchByIdService, createBranch as createBranchService, updateBranch as updateBranchService, deleteBranch as deleteBranchService } from "../services/branches";
+import { getBranches as getBranchesService, getBranchById as getBranchByIdService, createBranch as createBranchService, updateBranch as updateBranchService, deleteBranch as deleteBranchService, getBranchesSettings as getBranchesSettingsService, getBranchByIdSettings as getBranchByIdSettingsService } from "../services/branches";
 import { sendSuccessResponse } from "../middlewares/success";
 import { ID } from "../types/variables";
 
@@ -12,6 +12,18 @@ export const getBranches = catchAsyncErrors(async (_: Request, res: Response) =>
 export const getBranchById = catchAsyncErrors(async (req: Request, res: Response) => {
   const id = req.params.id as ID;
   const branch = await getBranchByIdService(id);
+  sendSuccessResponse(res, 200, "Branch fetched successfully", branch);
+});
+
+export const getBranchesSettings = catchAsyncErrors(async (_: Request, res: Response) => {
+  const branches = await getBranchesSettingsService();
+  sendSuccessResponse(res, 200, "Branches fetched successfully", branches);
+});
+
+
+export const getBranchByIdSettings = catchAsyncErrors(async (req: Request, res: Response) => {
+  const id = req.params.id as ID;
+  const branch = await getBranchByIdSettingsService(id);
   sendSuccessResponse(res, 200, "Branch fetched successfully", branch);
 });
 
@@ -31,6 +43,6 @@ export const updateBranch = catchAsyncErrors(async (req: Request, res: Response)
 
 export const deleteBranch = catchAsyncErrors(async (req: Request, res: Response) => {
   const id = req.params.id as ID;
-  await deleteBranchService(id);
-  sendSuccessResponse(res, 200, "Branch deleted successfully");
+  const data = await deleteBranchService(id);
+  sendSuccessResponse(res, 200, "Branch deleted successfully", data);
 });

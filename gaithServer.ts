@@ -16,6 +16,7 @@ import BranchesRouter from "./src/routers/branch";
 import GroupBranchesRouter from "./src/routers/groupBranch";
 import OrdersRouter from "./src/routers/orders";
 import CategoriesRouter from "./src/routers/categories";
+import BrandsRouter from "./src/routers/brands";
 
 const port = process.env.PORT || 5000;
 
@@ -63,6 +64,7 @@ app.use("/api/v0/sizes", SizesRouter);
 app.use("/api/v0/colors", ColorsRouter);
 app.use("/api/v0/products", ProductsRouter);
 app.use("/api/v0/branches", BranchesRouter);
+app.use("/api/v0/brands", BrandsRouter);
 app.use("/api/v0/group-branches", GroupBranchesRouter);
 app.use("/api/v0/orders", OrdersRouter);
 app.use("/api/v0/categories", CategoriesRouter);

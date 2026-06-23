@@ -19,6 +19,7 @@ export interface SizeCreationAttributes
 export interface CategoryAttributes {
   id: ID;
   name: string;
+  icon: string
 }
 
 export interface CategoryCreationAttributes

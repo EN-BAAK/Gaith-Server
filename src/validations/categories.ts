@@ -10,6 +10,9 @@ export const createCategory = [
   body("name")
     .notEmpty()
     .withMessage("Size name is required"),
+  body("icon")
+    .notEmpty()
+    .withMessage("Size icon is required"),
 ];
 
 export const updateCategory = [
@@ -21,4 +24,9 @@ export const updateCategory = [
     .optional()
     .notEmpty()
     .withMessage("Size name cannot be empty"),
+
+  body("icon")
+    .optional()
+    .notEmpty()
+    .withMessage("Size icon cannot be empty"),
 ];

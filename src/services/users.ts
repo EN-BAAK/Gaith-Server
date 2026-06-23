@@ -7,6 +7,7 @@ import { resetEmailMessage, sendEmail, verifyAccountMessage } from "../utils/mai
 import { User } from "../models/users";
 import { PasswordReset } from "../models/passwordReset";
 import jwt from "jsonwebtoken";
+import { Op } from "sequelize";
 
 const sendVerificationEmail = async (user: User, unverified?: UnverifiedUser | null) => {
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
@@ -106,7 +107,12 @@ export const getUnverifiedUsersService = async () => {
 export const getVerifiedUsersService = async () => {
   return User.findAll({
     include: [{ model: UnverifiedUser, as: "unverified", required: false }],
-    where: { "$unverified.id$": null },
+    where: {
+      role: {
+        [Op.ne]: "ADMIN",
+      },
+      "$unverified.id$": null
+    },
     order: [["id", "DESC"]],
   });
 };

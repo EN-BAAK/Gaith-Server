@@ -7,7 +7,7 @@ import {
   remove,
 } from "../controllers/colors";
 
-import { verifyAuthentication } from "../middlewares/auth";
+import { verifyAuthentication, verifyRole } from "../middlewares/auth";
 import { validation } from "../middlewares/error";
 
 import {
@@ -15,13 +15,16 @@ import {
   createColor as createColorValidation,
   updateColor as updateColorValidation,
 } from "../validations/colors";
+import { ROLE } from "../types/variables";
 
 const router = Router();
 
-router.get("/", getAll);
+router.get("/", verifyAuthentication, verifyRole([ROLE.ADMIN]), getAll);
 
 router.get(
   "/:id",
+  verifyAuthentication,
+  verifyRole([ROLE.ADMIN]),
   colorId,
   validation,
   getById
@@ -30,6 +33,7 @@ router.get(
 router.post(
   "/",
   verifyAuthentication,
+  verifyRole([ROLE.ADMIN]),
   createColorValidation,
   validation,
   create
@@ -38,6 +42,7 @@ router.post(
 router.put(
   "/:id",
   verifyAuthentication,
+  verifyRole([ROLE.ADMIN]),
   updateColorValidation,
   validation,
   update
@@ -46,6 +51,7 @@ router.put(
 router.delete(
   "/:id",
   verifyAuthentication,
+  verifyRole([ROLE.ADMIN]),
   colorId,
   validation,
   remove

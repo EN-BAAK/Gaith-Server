@@ -35,4 +35,5 @@ export const updateGroupBranch = async (id: ID, data: GroupBranchCreationAttribu
 export const deleteGroupBranch = async (id: ID) => {
   const groupBranch = await findGroupBranchById(id);
   await groupBranch.destroy();
+  return groupBranch
 };

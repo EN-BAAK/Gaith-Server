@@ -30,6 +30,6 @@ export const updateGroupBranch = catchAsyncErrors(async (req: Request, res: Resp
 
 export const deleteGroupBranch = catchAsyncErrors(async (req: Request, res: Response) => {
   const id = req.params.id as ID;
-  await deleteGroupBranchService(id);
-  sendSuccessResponse(res, 200, "Group branch deleted successfully");
+  const data = await deleteGroupBranchService(id);
+  sendSuccessResponse(res, 200, "Group branch deleted successfully", data);
 });

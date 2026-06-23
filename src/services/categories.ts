@@ -1,5 +1,6 @@
 import ErrorHandler from "../middlewares/error";
 import { Category } from "../models/categories";
+import { CategoryCreationAttributes } from "../types/models";
 
 const findById = async (id: number) => {
   const item = await Category.findByPk(id);
@@ -16,16 +17,20 @@ export const getCategoryById = async (id: number) => {
   return item.toJSON();
 };
 
-export const createCategory = async (data: { name: string }) => {
+export const createCategory = async (data: CategoryCreationAttributes) => {
   const item = await Category.create(data);
   return item.toJSON();
 };
 
-export const updateCategory = async (id: number, data: { name?: string }) => {
+export const updateCategory = async (id: number, data: Partial<CategoryCreationAttributes>) => {
   const item = await findById(id);
 
   if (data.name !== undefined) {
     item.name = data.name;
+  }
+
+  if (data.icon !== undefined) {
+    item.icon = data.icon;
   }
 
   await item.save();
