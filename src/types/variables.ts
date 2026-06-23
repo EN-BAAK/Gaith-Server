@@ -22,6 +22,11 @@ export type BlacklistedToken = {
 };
 
 export interface AuthenticatedRequest extends Request {
-  id?: number,
-  role?: string
+  id?: ID,
+  role?: ROLE
+}
+export enum OrderStatus {
+  PENDING = "pending",
+  PREPARED = "prepared",
+  RECEIVED = "received"
 }

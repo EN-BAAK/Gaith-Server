@@ -12,3 +12,17 @@ export interface ProductRelationsInput {
   colors?: ProductRelationItem[];
   sizes?: ProductRelationItem[];
 }
+
+export type OrderItemState = "new" | "old" | "edit" | "remove";
+
+export interface OrderItemInput {
+  id?: ID;
+  productId?: ID;
+  quantity?: number;
+  itemDiscountPercent?: number;
+  state: OrderItemState;
+}
+
+export interface OrderItemsInput {
+  items?: OrderItemInput[];
+}

@@ -1,9 +1,9 @@
 import jwt from "jsonwebtoken"
 import { NextFunction, Response } from "express";
 import ErrorHandler, { catchAsyncErrors } from "./error";
-import { User } from "../models/user";
+import { User } from "../models/users";
 import { isBlacklisted } from "../utils/tokenBlacklist";
-import { AuthenticatedRequest } from "../types/variables";
+import { AuthenticatedRequest, ROLE } from "../types/variables";
 
 export const verifyAuthentication = catchAsyncErrors(
   async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
@@ -37,6 +37,7 @@ export const verifyAuthentication = catchAsyncErrors(
     }
 
     req.id = user.id
+    req.role = user.role
 
     next();
   }
@@ -75,4 +76,18 @@ export const verifyAuthenticationHeader = async (
     }
     next(err);
   }
+};
+
+export const verifyRole = (allowedRoles: ROLE[]) => {
+  return (req: AuthenticatedRequest, _: Response, next: NextFunction) => {
+    if (!req.role) {
+      return next(new ErrorHandler("Forbidden: No role assigned to this request", 403));
+    }
+
+    if (!allowedRoles.includes(req.role as ROLE)) {
+      return next(new ErrorHandler("Forbidden: You do not have permission to access this resource", 403));
+    }
+
+    next();
+  };
 };

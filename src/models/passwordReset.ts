@@ -1,0 +1,55 @@
+import { DataTypes, Model, Sequelize } from "sequelize";
+import { PasswordCreationResetAttributes, PasswordResetAttributes } from "../types/models";
+import { ID } from "../types/variables";
+
+export class PasswordReset extends Model<PasswordResetAttributes, PasswordCreationResetAttributes>
+  implements PasswordResetAttributes {
+  public id!: ID;
+  public userId!: ID;
+  public code!: string;
+  public expiresAt!: Date;
+  public isVerified!: boolean;
+
+  public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
+
+  static associate(models: any) {
+    PasswordReset.belongsTo(models.User, { foreignKey: "userId", as: "user", onDelete: "CASCADE" });
+  }
+}
+
+export default (sequelize: Sequelize) => {
+  PasswordReset.init(
+    {
+      id: {
+        type: DataTypes.INTEGER.UNSIGNED,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      userId: {
+        type: DataTypes.INTEGER.UNSIGNED,
+        allowNull: false,
+      },
+      code: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      expiresAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
+      isVerified: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+    },
+    {
+      sequelize,
+      tableName: "password_resets",
+      timestamps: true,
+    }
+  );
+
+  return PasswordReset;
+};
