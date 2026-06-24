@@ -1,4 +1,4 @@
-import { DataTypes, Model, Sequelize } from "sequelize";
+import { BelongsToManyAddAssociationMixin, BelongsToManyRemoveAssociationMixin, DataTypes, Model, Sequelize } from "sequelize";
 import path from "path";
 import fs from "fs";
 
@@ -8,6 +8,8 @@ import {
 } from "../types/models";
 
 import { ID } from "../types/variables";
+import { Color } from "./colors";
+import { Size } from "./sizes";
 
 export class Product extends Model<
   ProductAttributes,
@@ -29,6 +31,11 @@ export class Product extends Model<
   public wholesalePrice!: number;
 
   public description!: string | null;
+
+  public addColor!: BelongsToManyAddAssociationMixin<Color, number>;
+  public removeColor!: BelongsToManyRemoveAssociationMixin<Color, number>;
+  public addSize!: BelongsToManyAddAssociationMixin<Size, number>;
+  public removeSize!: BelongsToManyRemoveAssociationMixin<Size, number>;
 
   public toJSON(): object {
     return { ...this.get() };

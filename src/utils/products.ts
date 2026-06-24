@@ -1,32 +1,30 @@
 import { Product } from "../models/products";
 import { ProductRelationItem } from "../types/transactions";
-import { ID } from "../types/variables";
 
 export const handleProductRelations = async (
   product: Product,
-  items: ProductRelationItem[] = [],
+  items: any,
   type: "colors" | "sizes",
-  createFn: (name: string) => Promise<{ id: ID }>,
   transaction?: any
 ) => {
-  for (const item of items) {
-    const method = `add${capitalize(type)}`;
+  const singularType = capitalize(type.slice(0, -1));
+  const addMethod = `add${singularType}`;
+  const removeMethod = `remove${singularType}`;
+
+  const parsedItems: ProductRelationItem[] = typeof items === "string"
+    ? JSON.parse(items)
+    : items;
+
+  for (const item of parsedItems) {
+    const targetId = Number(item.id);
 
     switch (item.state) {
       case "new":
-        await (product as any)[method](item.id, { transaction });
+        await (product as any)[addMethod](targetId, { transaction });
         break;
 
-      case "delete":
-        await (product as any)[method.replace("add", "remove")](
-          item.id,
-          { transaction }
-        );
-        break;
-
-      case "created":
-        const created = await createFn(String(item.id));
-        await (product as any)[method](created.id, { transaction });
+      case "remove":
+        await (product as any)[removeMethod](targetId, { transaction });
         break;
 
       case "old":
@@ -34,6 +32,5 @@ export const handleProductRelations = async (
     }
   }
 };
-
 const capitalize = (s: string) =>
   s.charAt(0).toUpperCase() + s.slice(1);

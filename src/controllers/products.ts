@@ -8,6 +8,8 @@ import {
   createProduct,
   updateProduct,
   deleteProductById,
+  getProductById,
+  getProductByIdSettings,
 } from "../services/products";
 import { AuthenticatedRequest, ID, ROLE } from "../types/variables";
 
@@ -31,15 +33,27 @@ export const getAll = catchAsyncErrors(async (req: AuthenticatedRequest, res: Re
     role
   );
 
-  const totalPages = Math.ceil(data.count / limit);
+  const total = data.count;
+  const totalPages =
+    Math.ceil(total / limit);
 
   sendSuccessResponse(res, 200, "Products fetched", {
     items: data.rows,
     page,
     limit,
-    total: data.count,
+    total,
     totalPages,
-  });
+    hasMore:
+      page < totalPages,
+    nextPage:
+      page < totalPages
+        ? page + 1
+        : null,
+    prevPage:
+      page > 1
+        ? page - 1
+        : null,
+  },);
 });
 
 export const getAllSettings = catchAsyncErrors(async (req: Request, res: Response) => {
@@ -51,13 +65,46 @@ export const getAllSettings = catchAsyncErrors(async (req: Request, res: Respons
 
   const data = await getAllProductsSettings(page, limit, offsetUnit, search);
 
-  sendSuccessResponse(res, 200, "Products settings fetched", data);
+  const total = data.count;
+  const totalPages =
+    Math.ceil(total / limit);
+
+  sendSuccessResponse(res, 200, "Products settings fetched", {
+    items: data.rows,
+    page,
+    limit,
+    total,
+    totalPages,
+    hasMore:
+      page < totalPages,
+    nextPage:
+      page < totalPages
+        ? page + 1
+        : null,
+    prevPage:
+      page > 1
+        ? page - 1
+        : null,
+  });
+});
+
+export const getById = catchAsyncErrors(async (req: AuthenticatedRequest, res: Response) => {
+  const id = req.params.id as ID;
+  const role = req.role! as ROLE;
+  const product = await getProductById(id, role);
+  sendSuccessResponse(res, 200, "Product fetched", product);
+});
+
+export const getByIdSettings = catchAsyncErrors(async (req: Request, res: Response) => {
+  const id = req.params.id as ID;
+  const product = await getProductByIdSettings(id);
+  sendSuccessResponse(res, 200, "Product settings fetched", product
+  );
 });
 
 export const create = catchAsyncErrors(async (req: Request, res: Response) => {
   const { colors, sizes, ...data } = req.body;
   const file = req.file;
-
   const product = await createProduct(data, file, { colors, sizes });
   sendSuccessResponse(res, 201, "Product created", product);
 });

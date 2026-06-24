@@ -1,5 +1,5 @@
 import { Op } from "sequelize";
-import sequelize from "../models";
+import db from "../models";
 import ErrorHandler from "../middlewares/error";
 import { Product } from "../models/products";
 import { ID, ROLE } from "../types/variables"
@@ -10,6 +10,7 @@ import { Size } from "../models/sizes";
 import { ProductRelationsInput } from "../types/transactions";
 import fs from "fs"
 import { Category } from "../models/categories";
+import { Brand } from "../models/brands";
 
 const findProductById = async (id: ID, properties: boolean = false) => {
   const product = await Product.findByPk(id, {
@@ -17,8 +18,9 @@ const findProductById = async (id: ID, properties: boolean = false) => {
       properties ?
         [
           { model: Category, as: "category", attributes: ["name"] },
-          { model: Color, as: "colors", attributes: ["name"] },
-          { model: Size, as: "sizes", attributes: ["name"] },
+          { model: Brand, as: "brand", attributes: ["name", "id"] },
+          { model: Color, as: "colors", attributes: ["name", "id"] },
+          { model: Size, as: "sizes", attributes: ["name", "id"] },
         ] : [],
   });
 
@@ -32,9 +34,10 @@ const findProductById = async (id: ID, properties: boolean = false) => {
 const findProductByIdSettings = async (id: ID) => {
   const product = await Product.findByPk(id, {
     include: [
-      { model: Category, as: "category" },
-      { model: Color, as: "colors" },
-      { model: Size, as: "sizes" },
+      { model: Category, as: "category", attributes: ["name"] },
+      { model: Brand, as: "brand", attributes: ["name", "id"] },
+      { model: Color, as: "colors", attributes: ["name", "id"] },
+      { model: Size, as: "sizes", attributes: ["name", "id"] },
     ],
   });
 
@@ -42,7 +45,7 @@ const findProductByIdSettings = async (id: ID) => {
     throw new ErrorHandler("Product not found", 404);
   }
 
-  return product;
+  return mapProductSettings(product);
 };
 
 const mapProduct = (product: any, role?: ROLE) => {
@@ -51,23 +54,64 @@ const mapProduct = (product: any, role?: ROLE) => {
   return {
     id: json.id,
     title: json.title,
-
+    description: json.description,
+    summarize: json.summarize,
     price:
       role === ROLE.WHOLESALE
         ? json.wholesalePrice
         : json.retailPrice,
 
-    categoryId: json.categoryId,
-    brandId: json.brandId,
+    categoryId: undefined,
+    brandId: undefined,
+
+    category: json.category
+      ? {
+        id: json.category.id,
+        name: json.category.name
+      }
+      : null,
+
+    brand: json.brand
+      ? {
+        id: json.brand.id,
+        name: json.brand.name,
+        imgUrl: json.brand.imgUrl
+      }
+      : null,
+
+    colors: json.colors?.map((c: any) => ({ name: c.name })) || [],
+    sizes: json.sizes?.map((s: any) => ({ name: s.name })) || [],
+  };
+};
+
+const mapProductSettings = (product: any) => {
+  const json = product.toJSON();
+
+  return {
+    ...json,
+
+    categoryId: undefined,
+    brandId: undefined,
 
     imgUrl: json.imgUrl,
 
     category: json.category
-      ? json.category.name
+      ? {
+        id: json.category.id,
+        name: json.category.name
+      }
       : null,
 
-    colors: json.colors?.map((c: any) => c.name) || [],
-    sizes: json.sizes?.map((s: any) => s.name) || [],
+    brand: json.brand
+      ? {
+        id: json.brand.id,
+        name: json.brand.name,
+        imgUrl: json.brand.imgUrl
+      }
+      : null,
+
+    colors: json.colors?.map((c: any) => ({ id: c.id, name: c.name })) || [],
+    sizes: json.sizes?.map((s: any) => ({ id: s.id, name: s.name })) || [],
   };
 };
 
@@ -122,17 +166,21 @@ export const getAllProductsSettings = async (
     where.title = { [Op.like]: `%${search}%` };
   }
 
-  return Product.findAndCountAll({
+  const { rows, count } = await Product.findAndCountAll({
     where,
     limit,
     offset,
     order: [["id", "DESC"]],
     include: [
       { model: Category, as: "category" },
+      { model: Brand, as: "brand" },
       { model: Color, as: "colors" },
       { model: Size, as: "sizes" },
     ],
   });
+
+  const products = rows.map(p => mapProductSettings(p))
+  return { rows: products, count }
 };
 
 export const getProductById = async (id: ID, role?: ROLE) => {
@@ -149,7 +197,8 @@ export const createProduct = async (
   image?: Express.Multer.File,
   relations?: ProductRelationsInput
 ) => {
-  const t = await sequelize.transaction();
+  if (!db || !db.sequelize) return;
+  const t = await db.sequelize.transaction();
 
   try {
     const imgUrl = image
@@ -166,9 +215,7 @@ export const createProduct = async (
         product,
         relations.colors,
         "colors",
-        async (name: string) => {
-          return await Color.create({ name }, { transaction: t });
-        }
+        t
       );
     }
 
@@ -177,9 +224,7 @@ export const createProduct = async (
         product,
         relations.sizes,
         "sizes",
-        async (name: string) => {
-          return await Size.create({ name }, { transaction: t });
-        }
+        t
       );
     }
 
@@ -198,7 +243,8 @@ export const updateProduct = async (
   image?: Express.Multer.File,
   relations?: ProductRelationsInput
 ) => {
-  const t = await sequelize.transaction();
+  if (!db || !db.sequelize) return;
+  const t = await db.sequelize.transaction();
 
   try {
     const product = await findProductById(id);
@@ -224,9 +270,7 @@ export const updateProduct = async (
         product,
         relations.colors,
         "colors",
-        async (name: string) => {
-          return await Color.create({ name }, { transaction: t });
-        }
+        t
       );
     }
 
@@ -235,9 +279,7 @@ export const updateProduct = async (
         product,
         relations.sizes,
         "sizes",
-        async (name: string) => {
-          return await Size.create({ name }, { transaction: t });
-        }
+        t
       );
     }
 

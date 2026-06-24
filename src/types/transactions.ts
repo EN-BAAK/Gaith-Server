@@ -1,7 +1,7 @@
 import { ID } from "./variables";
 
 export type ProductRelationState =
-  "new" | "delete" | "old" | "created";
+  "new" | "remove" | "old" | "created";
 
 export interface ProductRelationItem {
   id: ID;
