@@ -34,7 +34,7 @@ const findProductById = async (id: ID, properties: boolean = false) => {
 const findProductByIdSettings = async (id: ID) => {
   const product = await Product.findByPk(id, {
     include: [
-      { model: Category, as: "category", attributes: ["name"] },
+      { model: Category, as: "category", attributes: ["name", "id"] },
       { model: Brand, as: "brand", attributes: ["name", "id"] },
       { model: Color, as: "colors", attributes: ["name", "id"] },
       { model: Size, as: "sizes", attributes: ["name", "id"] },
