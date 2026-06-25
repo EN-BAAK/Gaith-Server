@@ -18,9 +18,9 @@ const findProductById = async (id: ID, properties: boolean = false) => {
       properties ?
         [
           { model: Category, as: "category", attributes: ["name"] },
-          { model: Brand, as: "brand", attributes: ["name", "id"] },
-          { model: Color, as: "colors", attributes: ["name", "id"] },
-          { model: Size, as: "sizes", attributes: ["name", "id"] },
+          { model: Brand, as: "brand", attributes: ["name", "imgUrl"] },
+          { model: Color, as: "colors", attributes: ["name"] },
+          { model: Size, as: "sizes", attributes: ["name"] },
         ] : [],
   });
 
@@ -35,7 +35,7 @@ const findProductByIdSettings = async (id: ID) => {
   const product = await Product.findByPk(id, {
     include: [
       { model: Category, as: "category", attributes: ["name", "id"] },
-      { model: Brand, as: "brand", attributes: ["name", "id"] },
+      { model: Brand, as: "brand", attributes: ["name", "id", "imgUrl"] },
       { model: Color, as: "colors", attributes: ["name", "id"] },
       { model: Size, as: "sizes", attributes: ["name", "id"] },
     ],
@@ -55,6 +55,7 @@ const mapProduct = (product: any, role?: ROLE) => {
     id: json.id,
     title: json.title,
     description: json.description,
+    imgUrl: json.imgUrl,
     summarize: json.summarize,
     price:
       role === ROLE.WHOLESALE
@@ -64,23 +65,17 @@ const mapProduct = (product: any, role?: ROLE) => {
     categoryId: undefined,
     brandId: undefined,
 
-    category: json.category
-      ? {
-        id: json.category.id,
-        name: json.category.name
-      }
-      : null,
+    category: json.category?.name || null,
 
     brand: json.brand
       ? {
-        id: json.brand.id,
         name: json.brand.name,
         imgUrl: json.brand.imgUrl
       }
       : null,
 
-    colors: json.colors?.map((c: any) => ({ name: c.name })) || [],
-    sizes: json.sizes?.map((s: any) => ({ name: s.name })) || [],
+    colors: json.colors?.map((c: any) => c.name) || [],
+    sizes: json.sizes?.map((s: any) => s.name) || [],
   };
 };
 
@@ -140,6 +135,7 @@ export const getAllProducts = async (
     offset,
     order: [["id", "DESC"]],
     include: [
+      { model: Brand, as: "brand", attributes: ["name", "imgUrl"] },
       { model: Category, as: "category", attributes: ["name"] },
       { model: Color, as: "colors", attributes: ["name"] },
       { model: Size, as: "sizes", attributes: ["name"] },
