@@ -1,4 +1,4 @@
-import sequelize from "../models";
+import db from "../models";
 import { Order } from "../models/order";
 import { OrderItem } from "../models/orderItem";
 import { Product } from "../models/products";
@@ -33,7 +33,7 @@ export const getUserOrderById = async (id: ID) => {
 };
 
 export const createOrder = async (userId: ID, role: ROLE, data: any) => {
-  const t = await sequelize.transaction();
+  const t = await db.sequelize!.transaction();
 
   try {
     const order = await Order.create({
@@ -106,7 +106,7 @@ const handleOrderItems = async (order: Order, items: OrderItemInput[], role: ROL
 };
 
 export const updateOrder = async (id: ID, role: ROLE, data: any) => {
-  const t = await sequelize.transaction();
+  const t = await db.sequelize!.transaction();
 
   try {
     const order = await findOrderById(id, true);

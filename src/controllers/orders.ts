@@ -9,7 +9,26 @@ export const getAll = catchAsyncErrors(async (req: Request, res: Response) => {
   const limit = parseInt(req.query.l as string) || 10;
 
   const data = await getOrders(page, limit);
-  sendSuccessResponse(res, 200, "Orders fetched", data);
+  const total = data.count;
+  const totalPages = Math.ceil(total / limit);
+
+  sendSuccessResponse(res, 200, "Orders fetched", {
+    items: data.rows,
+    page,
+    limit,
+    total,
+    totalPages,
+    hasMore:
+      page < totalPages,
+    nextPage:
+      page < totalPages
+        ? page + 1
+        : null,
+    prevPage:
+      page > 1
+        ? page - 1
+        : null,
+  },);
 });
 
 export const getUserAll = catchAsyncErrors(async (req: AuthenticatedRequest, res: Response) => {
