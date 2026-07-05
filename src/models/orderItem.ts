@@ -29,6 +29,12 @@ export class OrderItem
       as: "order",
       onDelete: "CASCADE"
     });
+
+    OrderItem.belongsTo(models.Product, {
+      foreignKey: "productId",
+      as: "product",
+      onDelete: "CASCADE"
+    });
   }
 }
 

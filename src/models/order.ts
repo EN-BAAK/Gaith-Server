@@ -30,6 +30,12 @@ export class Order extends Model<OrderAttributes, OrderCreationAttributes> imple
       as: "items",
       onDelete: "CASCADE"
     });
+
+    Order.belongsTo(models.User, {
+      foreignKey: "userId",
+      as: "user",
+      onDelete: "CASCADE"
+    });
   }
 }
 

@@ -69,6 +69,12 @@ export class Product extends Model<
       as: "category",
       onDelete: "CASCADE",
     });
+
+    Product.hasMany(models.Category, {
+      foreignKey: "productId",
+      as: "items",
+      onDelete: "CASCADE",
+    });
   }
 }
 

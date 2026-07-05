@@ -23,6 +23,7 @@ export class User extends Model<UserAttributes, UserCreationAttributes> implemen
   static associate(models: any) {
     User.hasOne(models.UnverifiedUser, { foreignKey: "userId", as: "unverified", onDelete: "CASCADE" });
     User.hasOne(models.PasswordReset, { foreignKey: "userId", as: "passwordReset", onDelete: "CASCADE" });
+    User.hasMany(models.Order, { foreignKey: "userId", as: "orders", onDelete: "CASCADE" });
   }
 }
 
