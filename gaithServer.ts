@@ -18,6 +18,7 @@ import OrdersRouter from "./src/routers/orders";
 import CategoriesRouter from "./src/routers/categories";
 import BrandsRouter from "./src/routers/brands";
 import DashboardRouter from "./src/routers/dashboard";
+import ContactRouter from "./src/routers/contact";
 
 const port = process.env.PORT || 5000;
 
@@ -70,6 +71,7 @@ app.use("/api/v0/group-branches", GroupBranchesRouter);
 app.use("/api/v0/orders", OrdersRouter);
 app.use("/api/v0/categories", CategoriesRouter);
 app.use("/api/v0/dashboard", DashboardRouter);
+app.use("/api/v0/contact", ContactRouter);
 
 // Next.js handler
 // app.all(/.*/, (req, res) => {
