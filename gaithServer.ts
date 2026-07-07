@@ -19,6 +19,7 @@ import CategoriesRouter from "./src/routers/categories";
 import BrandsRouter from "./src/routers/brands";
 import DashboardRouter from "./src/routers/dashboard";
 import ContactRouter from "./src/routers/contact";
+import SettingsRouter from "./src/routers/settings";
 
 const port = process.env.PORT || 5000;
 
@@ -72,6 +73,7 @@ app.use("/api/v0/orders", OrdersRouter);
 app.use("/api/v0/categories", CategoriesRouter);
 app.use("/api/v0/dashboard", DashboardRouter);
 app.use("/api/v0/contact", ContactRouter);
+app.use("/api/v0/settings", SettingsRouter);
 
 // Next.js handler
 // app.all(/.*/, (req, res) => {
@@ -81,9 +83,7 @@ app.use("/api/v0/contact", ContactRouter);
 app.use(error);
 
 try {
-  // await db.sequelize?.sync();
-  // 
-  db.sequelize?.sync().then(() => {
+  db.sequelize?.authenticate().then(() => {
     app.listen(Number(port), () => {
       console.log(`Server is running on port ${port}`);
     });

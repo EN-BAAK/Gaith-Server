@@ -5,8 +5,11 @@
   "main": "gaithServer.js",
   "scripts": {
     "dev": "nodemon gaithServer.ts",
+    "dev:ts": "ts-node gaithServer.ts",
     "build": "tsc",
     "start": "node dist/gaithServer.js",
+    "db:init:dev": "ts-node initializeDB",
+    "db:init": "node dist/initializeDB",
     "prepare": "npm run clean && npm run build",
     "clean": "rm -rf dist"
   },

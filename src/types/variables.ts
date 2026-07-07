@@ -30,3 +30,19 @@ export enum OrderStatus {
   PREPARED = "prepared",
   RECEIVED = "received"
 }
+
+export interface ISettings {
+  supportEmail: string;
+  phone: string;
+  whatsapp: string;
+  youtube: string;
+  instagram: string;
+  facebook: string;
+  linkedIn: string;
+  twitter: string;
+  tiktok: string;
+  aboutSubtitle: string;
+  location: string,
+  contactSubtitle: string,
+  whatsappLink: string,
+}
