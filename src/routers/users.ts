@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { verifyAuthentication, verifyRole } from "../middlewares/auth";
+import { verifyAuthentication, verifyAuthenticationHeader, verifyRole } from "../middlewares/auth";
 import { validation } from "../middlewares/error";
-import { register, verifyAccount, verifyUser, getUnverifiedUsers, getVerifiedUsers, updateRole, changePassword, forgotPassword, resetForgottenPassword, getProfile, login, logout, resendVerificationAccountCode, } from "../controllers/users";
+import { register, verifyAccount, verifyUser, getUnverifiedUsers, getVerifiedUsers, updateRole, changePassword, forgotPassword, resetForgottenPassword, getProfile, login, logout, resendVerificationAccountCode, verify, } from "../controllers/users";
 import { registerValidation, verifyAccountValidation, updateRoleValidation, changePasswordValidation, forgotPasswordValidation, resetForgottenPasswordValidation, loginValidation, resendVerificationCodeValidation, } from "../validations/users";
 import { ROLE } from "../types/variables";
 
@@ -11,6 +11,7 @@ router.get("/profile", verifyAuthentication, getProfile);
 router.get("/verify-me", verifyAuthentication, verifyUser);
 router.get("/unverified", verifyAuthentication, verifyRole([ROLE.ADMIN]), getUnverifiedUsers);
 router.get("/verified", verifyAuthentication, verifyRole([ROLE.ADMIN]), getVerifiedUsers);
+router.get("/verify-protected-middleware", verifyAuthenticationHeader, verify);
 
 router.post("/logout", verifyAuthentication, logout);
 router.post("/login", loginValidation, validation, login);

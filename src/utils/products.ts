@@ -1,12 +1,7 @@
 import { Product } from "../models/products";
 import { ProductRelationItem } from "../types/transactions";
 
-export const handleProductRelations = async (
-  product: Product,
-  items: any,
-  type: "colors" | "sizes",
-  transaction?: any
-) => {
+export const handleProductRelations = async (product: Product,items: any,type: "colors" | "sizes",transaction?: any) => {
   const singularType = capitalize(type.slice(0, -1));
   const addMethod = `add${singularType}`;
   const removeMethod = `remove${singularType}`;

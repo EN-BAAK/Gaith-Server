@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { catchAsyncErrors } from "../middlewares/error";
+import ErrorHandler, { catchAsyncErrors } from "../middlewares/error";
 import { sendSuccessResponse } from "../middlewares/success";
 import { AuthenticatedRequest, ID } from "../types/variables";
 import {
@@ -15,6 +15,7 @@ import {
   getUserProfileService,
   loginService,
   resendVerificationAccountCodeService,
+  verifyService,
 } from "../services/users";
 import jwt from "jsonwebtoken";
 import { addToBlacklist } from "../utils/tokenBlacklist";
@@ -35,6 +36,16 @@ export const resendVerificationAccountCode = catchAsyncErrors(async (req: Reques
   const result = await resendVerificationAccountCodeService(email);
   sendSuccessResponse(res, 200, result.message);
 });
+
+export const verify = catchAsyncErrors(async (req: AuthenticatedRequest, res: Response) => {
+  const userId = req.id
+
+  if (!userId)
+    return new ErrorHandler("Internal Server Error", 500)
+
+  const result = await verifyService(userId);
+  sendSuccessResponse(res, 200, "Verified", result)
+})
 
 export const verifyUser = catchAsyncErrors(async (req: AuthenticatedRequest, res: Response) => {
   const id = req.id!;

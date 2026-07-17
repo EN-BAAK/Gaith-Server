@@ -47,6 +47,12 @@ export const registerService = async (userData: UserCreationAttributes) => {
   return { message: "Account created successfully. Please check your email for the verification code." };
 };
 
+export const verifyService = async (userId: ID) => {
+  const userInfo = await User.findByPk(userId);
+  const json = userInfo?.toJSON() as any
+  return json;
+};
+
 export const resendVerificationAccountCodeService = async (email: string) => {
   const existingUser = await User.findOne({
     where: { email },
